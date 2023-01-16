@@ -66,50 +66,38 @@ Client.on("guildMemberRemove", member =>{
 });
 
 Client.on("interactionCreate", interaction => {
-   if(interaction.isCommand()){
-       if (interaction.commandName === "ping"){
-           let user = interaction.options.getUser("utilisateur");
-           if (user != undefined){
-               interaction.reply("pong <@" + user.id + ">");
-           }
-           else {
-               interaction.reply("pong");
-           }
-           
-       }
-   }
+    if(interaction.isCommand()){
+        if (interaction.commandName === "ping"){
+            let user = interaction.options.getUser("utilisateur");
+            if (user){
+                interaction.reply("pong <@" + user.id + ">");
+            } else {
+                interaction.reply("pong");
+            }
+        } else {
+            interaction.reply("Commande inconnue, utilisez !help pour voir les commandes disponibles.");
+        }
+    }
 });
 
 Client.on("messageCreate", message => {
-   if (message.author.bot) return;
-if (message.content === prefix + "help"){
-   const embed = new Discord.MessageEmbed()
-       .setColor("00099ff")
-       .setTitle("HUM HUM ! (Il s'agit de la liste des commandes)")
-       .setURL("https://discord.js.org/")
-       .setAuthor({ name: "Auteur du bot",iconURL: "https://demonslayer.fr/wp-content/uploads/2021/09/Nezuko-3.jpg",url: "https://discord.js.org/"})
-       .setDescription("Une petite description")
-       .setThumbnail("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
-       .addField("!help","affiche la liste des commandes")
-       .addField("!profil","votre profil")
-       .addField("!collection", "votre collection de jeu")
-       .setImage("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
-       .setTimestamp()
-       .setFooter({text: "A bientôt !", iconURL: "https://www.icegif.com/wp-content/uploads/nezuko-icegif.gif"});
-
-   message.channel.send({ embeds: [embed] })
-}
-
-
-
-    message.channel.send("Humm Humm !");
-    ping
-    if (message.content === prefix + "ping"){
-       message.reply("pong");
-    }
-    else if (message.content === prefix + "help"){
-       message.channel.send("Humm Humm !");
-    }
-});
+    if (message.author.bot) return;
+    if (message.content === prefix + "help"){
+        const embed = new Discord.MessageEmbed()
+            .setColor("00099ff")
+            .setTitle("HUM HUM ! (Il s'agit de la liste des commandes)")
+            .setURL("https://discord.js.org/")
+            .setAuthor({ name: "Auteur du bot",iconURL: "https://demonslayer.fr/wp-content/uploads/2021/09/Nezuko-3.jpg",url: "https://discord.js.org/"})
+            .setDescription("Une petite description")
+            .setThumbnail("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
+            .addField("!help","affiche la liste des commandes")
+            .addField("!profil","votre profil")
+            .addField("!collection", "votre collection de jeu")
+            .setImage("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
+            .setTimestamp()
+            .setFooter({text: "A bientôt !", iconURL: "https://www.icegif.com/wp-content/uploads/nezuko-icegif.gif"});
+ 
+        message.channel.send({ embeds: [embed]
+ 
 
 Client.login(process.env.TOKEN);
