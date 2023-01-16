@@ -20,18 +20,30 @@ const data = new SlashCommandBuilder()
         .setDescription("utilisateur de votre choix")
         .setRequired(false));
 
-Client.on("ready", async () => { 
-    Client.application.commands.create(data);
-    Client.guilds.cache.get("929355712369405993").commands.create(data);
-    
-    console.log(Client.application.commands.cache);
-    await Client.application.commands.fetch();
-    console.log(Client.application.commands.cache);
+const dataHelp = new SlashCommandBuilder()
+    .setName("help")
+    .setDescription("affiche la liste des commandes disponibles"); 
 
-    Client.application.commands.cache.map(command => {
-       command.delete();
-    })
-    console.log("bot opérationnel");
+Client.on("ready", async () => {
+    Client.application.commands.create(data);
+    Client.application.commands.create(dataHelp);
+        console.log("Les commandes ont été créées");
+        });
+Client.on("interactionCreate", interaction => {
+    if(interaction.isCommand()){
+    if (interaction.commandName === "ping"){
+        let user = interaction.options.getUser("utilisateur");
+        if (user != undefined){
+            interaction.reply("pong <@" + user.id + ">");
+            }
+        else {
+            interaction.reply("pong");
+            }
+            }
+    else if(interaction.commandName === "help"){
+            interaction.reply("liste des commandes disponibles: !ping, !help, etc.");
+            }
+    }
 });
 
 Client.on("guildMemberAdd", member => {
@@ -89,9 +101,9 @@ Client.on("interactionCreate", interaction => {
             .setAuthor({ name: "Auteur du bot",iconURL: "https://demonslayer.fr/wp-content/uploads/2021/09/Nezuko-3.jpg",url: "https://discord.js.org/"})
             .setDescription("Une petite description")
             .setThumbnail("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
-            .addField("/help","affiche la liste des commandes")
-            .addField("/profil","votre profil")
-            .addField("/collection", "votre collection de jeu")
+            .addField("!help","affiche la liste des commandes")
+            .addField("!profil","votre profil")
+            .addField("!collection", "votre collection de jeu")
             .setImage("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
             .setTimestamp()
             .setFooter({text: "A bientôt !", iconURL: "https://www.icegif.com/wp-content/uploads/nezuko-icegif.gif"});
@@ -99,5 +111,6 @@ Client.on("interactionCreate", interaction => {
         interaction.response({ embeds: [embed] });
     }
 });
+ 
 
 Client.login(process.env.TOKEN);
