@@ -1,17 +1,21 @@
+///////////////// Copyright Velopce /////////////////////////
 const Discord = require("discord.js");
 const mysql = require("mysql");
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const prefix = "!";
-
-
 const Client = new Discord.Client({
     intents: [
         Discord.Intents.FLAGS.GUILDS,
         Discord.Intents.FLAGS.GUILD_MESSAGES,
         Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    ],
+    partials: [
+        "MESSAGE", 
+        "CHANNEL", 
+        "REACTION"
     ]
 });
-
 const data = new SlashCommandBuilder()
     .setName("ping")
     .setDescription("renvoie pong")
@@ -19,31 +23,27 @@ const data = new SlashCommandBuilder()
         .setName("utilisateur")
         .setDescription("utilisateur de votre choix")
         .setRequired(false));
+//Définition de la slash commande "Ping"
+const dataAide = new SlashCommandBuilder()  
+    .setName("aide")
+    .setDescription("Vous fournis les commandes utilisables et leurs fonctionnements");
+// Définition de la slash commande "Aide"
 
-const dataHelp = new SlashCommandBuilder()
-    .setName("help")
-    .setDescription("affiche la liste des commandes disponibles"); 
-
-Client.on("ready", async () => {
+Client.on("ready", async () => { 
     Client.application.commands.create(data);
-    Client.application.commands.create(dataHelp);
-        console.log("Les commandes ont été créées");
-        });
-Client.on("interactionCreate", interaction => {
-    if(interaction.isCommand()){
-    if (interaction.commandName === "ping"){
-        let user = interaction.options.getUser("utilisateur");
-        if (user != undefined){
-            interaction.reply("pong <@" + user.id + ">");
-            }
-        else {
-            interaction.reply("pong");
-            }
-            }
-    else if(interaction.commandName === "help"){
-            interaction.reply("liste des commandes disponibles: !ping, !help, etc.");
-            }
-    }
+    Client.application.commands.create(dataAide);
+    Client.guilds.cache.get("929355712369405993").commands.create(data);
+    Client.guilds.cache.get("929355712369405993").commands.create(dataAide);
+    
+    
+    console.log(Client.application.commands.cache);
+    await Client.application.commands.fetch();
+    console.log(Client.application.commands.cache);
+
+    Client.application.commands.cache.map(command => {
+       command.delete();
+    })
+    console.log("bot opérationnel");
 });
 
 Client.on("guildMemberAdd", member => {
@@ -68,49 +68,48 @@ Client.on("guildMemberAdd", member => {
 
     console.log("un membre est arrivé !");
     //<@>
-    Client.channels.cache.get("929469674431873024").send("<@" + member.id + "> est arrivé ! Bienvenue !");
-    member.roles.add("929472551896367106");
+    Client.channels.cache.get("1003315343743254528").send("<@" + member.id + "> est arrivé ! Bienvenue !");
+    member.roles.add("1065694026453504020");
 });
 
 Client.on("guildMemberRemove", member =>{
     console.log("un membre a quitté le serveur !");
-    Client.channels.cache.get("929469674431873024").send(member.displayName + " nous a quitté ! ...");
+    Client.channels.cache.get("1003315343743254528").send(member.displayName + " nous a quitté ! ...");
 });
 
 Client.on("interactionCreate", interaction => {
-    if(interaction.isCommand()){
-        if (interaction.commandName === "ping"){
-            let user = interaction.options.getUser("utilisateur");
-            if (user){
-                interaction.reply("pong <@" + user.id + ">");
-            } else {
-                interaction.reply("pong");
-            }
-        } else {
-            interaction.reply("Commande inconnue, utilisez !help pour voir les commandes disponibles.");
+   if(interaction.isCommand()){
+       if (interaction.commandName === "ping"){
+           let user = interaction.options.getUser("utilisateur");
+           if (user != undefined){
+               interaction.reply("pong <@" + user.id + ">");
+           }
+           else {
+               interaction.reply("pong");
+           }
+           
+       }
+   }
+});
+
+
+Client.on('messageReactionAdd', (reaction, user) => {
+    if (reaction.message.id === '1066044766971760681' && reaction.emoji.name === '✅') {
+        const role = reaction.message.guild.roles.cache.get('1065691095503224944');
+        const member = reaction.message.guild.members.cache.get(user.id);
+        if(role && member) {
+            member.roles.add(role);
         }
     }
 });
 
 Client.on("interactionCreate", interaction => {
-    if (interaction.isCommand() && interaction.commandName === "help") {
-        const embed = new Discord.MessageEmbed()
-            .setColor("00099ff")
-            .setTitle("HUM HUM ! (Il s'agit de la liste des commandes)")
-            .setURL("https://discord.js.org/")
-            .setAuthor({ name: "Auteur du bot",iconURL: "https://demonslayer.fr/wp-content/uploads/2021/09/Nezuko-3.jpg",url: "https://discord.js.org/"})
-            .setDescription("Une petite description")
-            .setThumbnail("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
-            .addField("!help","affiche la liste des commandes")
-            .addField("!profil","votre profil")
-            .addField("!collection", "votre collection de jeu")
-            .setImage("https://64.media.tumblr.com/0125643c0e5818ba16a689ea84a37d2e/tumblr_prpvfkPdVA1v6bs4yo4_r1_250.gif")
-            .setTimestamp()
-            .setFooter({text: "A bientôt !", iconURL: "https://www.icegif.com/wp-content/uploads/nezuko-icegif.gif"});
- 
-        interaction.response({ embeds: [embed] });
+    if(interaction.isCommand()){
+        if (interaction.commandName === "aide"){  
+            interaction.reply("Bonjour, les commandes utilisables sont /ping et /aide !");
+            }    
+        }
     }
-});
- 
+ );
 
 Client.login(process.env.TOKEN);
